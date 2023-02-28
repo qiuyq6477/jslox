@@ -4,7 +4,7 @@ const Lox = require("../Lox")
 const AstPrinter = require("../AstPrinter")
 
 const scanner = new Scanner(`
-                    1+2*3
+                    1+2*3, 1+1>0 ? 1 : 2
                 `)
 const tokens = scanner.scanTokens()
 

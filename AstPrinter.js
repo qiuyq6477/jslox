@@ -8,6 +8,10 @@ class AstPrinter {
         return this.parenthesize(expr.operator.lexeme, expr.left, expr.right)
     }
 
+    visitTernaryExpr (expr) {
+        return this.parenthesize("?:", expr.condition, expr.left, expr.right)
+    }
+
     visitGroupingExpr (expr) {
         return this.parenthesize('group', expr.expression)
     }

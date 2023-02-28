@@ -7,6 +7,10 @@ class RpnPrinter {
         return this.polishize(expr.operator.lexeme, expr.left, expr.right)
     }
   
+    visitTernaryExpr (expr) {
+        return this.polishize("?:", expr.condition, expr.left, expr.right)
+    }
+
     visitGroupingExpr (expr) {
         return this.polishize('group', expr.expression)
     }

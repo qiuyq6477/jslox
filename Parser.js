@@ -18,10 +18,26 @@ class Parser {
         // }
     }
 
-    // expression     → equality ;
+    // expression     → equality ( "," equality )* ;
     expression()
     {
-        return this.equality()
+        let expr = this.equality()
+        
+        while(this.match(TokenType.COMMA))
+        {
+            expr = this.equality()
+        }
+
+        while(this.match(TokenType.QUESTION_MARK))
+        {
+            const condition = expr
+            const left = this.equality()
+            this.consume(TokenType.COLON, "Expect ':' after expression.")
+            const right = this.equality()
+            expr = new Expr.Ternary(condition, left, right)
+        }
+
+        return expr
     }
 
     // equality       → comparison ( ( "!=" | "==" ) comparison )* ;

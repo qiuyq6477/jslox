@@ -51,9 +51,23 @@ class Unary extends Expr {
   }
 }
 
+class Ternary extends Expr {
+  constructor (condition, left, right) {
+    super()
+    this.condition = condition
+    this.left = left
+    this.right = right
+  }
+
+  accept (visitor) {
+    return visitor.visitTernaryExpr(this)
+  }
+}
+
 module.exports = {
   Binary,
   Grouping,
   Literal,
-  Unary
+  Unary,
+  Ternary
 }

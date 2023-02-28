@@ -11,6 +11,9 @@ const TokenType = {
   SLASH: '/',
   STAR: '*',
 
+  QUESTION_MARK: '?',
+  COLON: ":",
+
   BANG: '!',
   BANG_EQUAL: '!=',
   EQUAL: '=',
