@@ -1,29 +1,36 @@
 class RpnPrinter {
-    print (expr) {
+    print (expr) 
+    {
         return expr.accept(this)
     }
   
-    visitBinaryExpr (expr) {
+    visitBinaryExpr (expr) 
+    {
         return this.polishize(expr.operator.lexeme, expr.left, expr.right)
     }
   
-    visitTernaryExpr (expr) {
+    visitTernaryExpr (expr) 
+    {
         return this.polishize("?:", expr.condition, expr.left, expr.right)
     }
 
-    visitGroupingExpr (expr) {
+    visitGroupingExpr (expr) 
+    {
         return this.polishize('group', expr.expression)
     }
   
-    visitLiteralExpr (expr) {
+    visitLiteralExpr (expr) 
+    {
         return expr.value.toString()
     }
   
-    visitUnaryExpr (expr) {
+    visitUnaryExpr (expr) 
+    {
         return this.polishize(expr.operator.lexeme, expr.right)
     }
   
-    polishize (name) {
+    polishize (name) 
+    {
         const exprs = Array.prototype.slice.call(arguments, 1)
         var str = ''
     

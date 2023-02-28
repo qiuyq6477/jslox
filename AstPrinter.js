@@ -1,30 +1,37 @@
 
 class AstPrinter {
-    print (expr) {
+    print (expr) 
+    {
         return expr.accept(this)
     }
 
-    visitBinaryExpr (expr) {
+    visitBinaryExpr (expr) 
+    {
         return this.parenthesize(expr.operator.lexeme, expr.left, expr.right)
     }
 
-    visitTernaryExpr (expr) {
+    visitTernaryExpr (expr) 
+    {
         return this.parenthesize("?:", expr.condition, expr.left, expr.right)
     }
 
-    visitGroupingExpr (expr) {
+    visitGroupingExpr (expr) 
+    {
         return this.parenthesize('group', expr.expression)
     }
 
-    visitLiteralExpr (expr) {
+    visitLiteralExpr (expr) 
+    {
         return expr.value.toString()
     }
 
-    visitUnaryExpr (expr) {
+    visitUnaryExpr (expr) 
+    {
         return this.parenthesize(expr.operator.lexeme, expr.right)
     }
 
-    parenthesize (name) {
+    parenthesize (name) 
+    {
         const exprs = Array.prototype.slice.call(arguments, 1)
         var str = `(${name}`
 
