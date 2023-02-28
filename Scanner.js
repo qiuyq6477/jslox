@@ -1,4 +1,5 @@
 const { TokenType, Token } = require('./Token')
+const Lox = require("./Lox")
 
 const keywords = {
     'and': TokenType.AND,
@@ -22,15 +23,13 @@ const keywords = {
 
 class Scanner {
 
-    constructor(source, error) {
+    constructor(source) {
         this.source = source
         this.tokens = []
 
         this.start = 0
         this.current = 0
         this.line = 1
-
-        this.error = error
     }
 
     scanTokens()
@@ -96,7 +95,7 @@ class Scanner {
                     this.identifier();
                 }
                 else {
-                    this.error(this.line, "Unexpected character." + c);
+                    Lox.error(this.line, "Unexpected character." + c);
                 }
                 break;
         }
@@ -109,7 +108,7 @@ class Scanner {
         }
 
         if (this.isAtEnd()) {
-            this.error(this.line, "Unterminated string.");
+            Lox.error(this.line, "Unterminated string.");
             return;
         }
 

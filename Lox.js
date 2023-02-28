@@ -1,16 +1,21 @@
 const fs = require("fs")
 const readline = require("readline")
 const Scanner = require("./Scanner")
-
+const Parser = require("./Parser")
+const AstPrinter = require("./AstPrinter")
 
 class Lox {
     constructor(){
-        this.hasError = false
+    }
+
+    readFile(filename)
+    {
+        return fs.readFileSync(filename).toString()
     }
 
     runFile(filename)
     {
-        const source = fs.readFileSync(filename).toString()
+        const source = this.readFile(filename)
         this.run(source)
         if(this.hasError){
             process.exit(0)
@@ -37,15 +42,13 @@ class Lox {
 
     run(source)
     {
-        let self = this
-        const scanner = new Scanner(source, function(line, message){
-            self.error(line, message)
-        })
+        const scanner = new Scanner(source)
         const tokens = scanner.scanTokens()
 
-        tokens.forEach(token => {
-            console.log(token)
-        });
+        const parser = new Parser(tokens)
+        const expression = parser.parse()
+        if(this.hasError) return
+        console.log(new AstPrinter().print(expression))
     }
 
 
@@ -60,12 +63,24 @@ class Lox {
                                     ^-- Here. 
         TODO2: 传递给扫描程序和解析器的某种ErrorReporter接口，这样就可以交换不同的报告策略
      */
-    error(line, message)
+    static hasError = false
+    static error(line, message)
     {
         this.report(line, "", message)
     }
 
-    report(line, where, message)
+    static parseError(token, message)
+    {
+        if (token.type == TokenType.EOF) 
+        {
+            report(token.line, " at end", message);
+        } else 
+        {
+            report(token.line, " at '" + token.lexeme + "'", message);
+        }
+    }
+
+    static report(line, where, message)
     {
         console.log("[line " + line + "] Error" + where + ": " + message)
         this.hasError = true
