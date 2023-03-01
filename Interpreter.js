@@ -3,6 +3,12 @@ const { TokenType, Token } = require("./Token")
 
 class Interpreter {
     
+    interpret(expression)
+    {
+        const value = this.evaluate(expression)
+        console.log(value)
+    }
+
     visitBinaryExpr (expr) 
     {
         const left = this.evaluate(expr.left)
@@ -10,14 +16,40 @@ class Interpreter {
 
         switch(expr.operator.type)
         {
-            case TokenType.MINUS: return left + right
-            case TokenType.SLASH: return left / right
-            case TokenType.STAR: return left * right
-            case TokenType.PLUS: return left + right
-            case TokenType.GREATER: return left > right
-            case TokenType.GREATER_EQUAL: return left >= right
-            case TokenType.LESS: return left < right
-            case TokenType.LESS_EQUAL: return left <= right
+            case TokenType.MINUS: 
+                this.checkNumberOperands(expr.operator, left, right)
+                return left - right
+            case TokenType.SLASH: 
+                this.checkNumberOperands(expr.operator, left, right)
+                if (Number(right) === 0) {
+                    throw new RuntimeError(expr.operator, 'Unable to divide by zero.')
+                }
+                return left / right
+            case TokenType.STAR: 
+                this.checkNumberOperands(expr.operator, left, right)
+                return left * right
+            case TokenType.PLUS: 
+                if (typeof left === 'number' || typeof right === 'number') 
+                {
+                    return Number(left) + Number(right)
+                }
+                if (typeof left === 'string' && typeof right === 'string') 
+                {
+                    return left + right
+                }
+                throw new RuntimeError(expr.operator, 'Operands must be two numbers or two strings.')
+            case TokenType.GREATER: 
+                this.checkNumberOperands(expr.operator, left, right)
+                return left > right
+            case TokenType.GREATER_EQUAL: 
+                this.checkNumberOperands(expr.operator, left, right)
+                return left >= right
+            case TokenType.LESS: 
+                this.checkNumberOperands(expr.operator, left, right)
+                return left < right
+            case TokenType.LESS_EQUAL: 
+                this.checkNumberOperands(expr.operator, left, right)
+                return left <= right
             case TokenType.BANG_EQUAL: return !this.isEqual(left, right)
             case TokenType.EQUAL_EQUAL: return this.isEqual(left, right)
 
@@ -46,11 +78,24 @@ class Interpreter {
 
         switch(expr.operator.type)
         {
-            case TokenType.MINUS: return -right
+            case TokenType.MINUS: 
+                this.checkNumberOperand(expr.operator, right)
+                return -right
             case TokenType.BANG: return !this.isTruthy(right)
         }
 
         return null
+    }
+
+    checkNumberOperand(operator, operand)
+    {
+        if(typeof operand == "number") return
+        throw new RuntimeError(operator, "Operand must be a numberf")
+    }
+
+    checkNumberOperands (operator, left, right) {
+        if (typeof left === 'number' && typeof right === 'number') return
+        throw new RuntimeError(operator, 'Operands must be a numbers.')
     }
 
     evaluate(expr)
@@ -70,3 +115,14 @@ class Interpreter {
         return left === right
     }
 }
+
+
+class RuntimeError extends Error {
+    constructor (token, message) 
+    {
+        super(message)
+        this.token = token
+    }
+}
+
+module.exports = Interpreter

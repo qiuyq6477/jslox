@@ -3,8 +3,10 @@ const readline = require("readline")
 const Scanner = require("./Scanner")
 const Parser = require("./Parser")
 const AstPrinter = require("./AstPrinter")
+const Interpreter = require("./Interpreter")
 
 class Lox {
+    static interpreter = new Interpreter()
     constructor(){
     }
 
@@ -17,7 +19,7 @@ class Lox {
     {
         const source = this.readFile(filename)
         this.run(source)
-        if(this.hasError){
+        if(this.hasError || this.hasRuntimeError){
             process.exit(0)
         }
     }
@@ -36,6 +38,7 @@ class Lox {
         rl.on('line', (line) => {
             this.run(line)
             this.hasError = false
+            this.hasRuntimeError = false
             rl.prompt()
         })
     }
@@ -47,8 +50,8 @@ class Lox {
 
         const parser = new Parser(tokens)
         const expression = parser.parse()
-        if(this.hasError) return
-        console.log(new AstPrinter().print(expression))
+        if(this.hasError || this.hasRuntimeError) return
+        this.interpreter(expression)
     }
 
 
@@ -64,6 +67,7 @@ class Lox {
         TODO2: 传递给扫描程序和解析器的某种ErrorReporter接口，这样就可以交换不同的报告策略
      */
     static hasError = false
+    static hasRuntimeError = false
     static error(line, message)
     {
         this.report(line, "", message)
@@ -84,6 +88,12 @@ class Lox {
     {
         console.log("[line " + line + "] Error" + where + ": " + message)
         this.hasError = true
+    }
+
+    static runtimeError(error)
+    {
+        console.log(error.getMessage() + "\n[line " + error.token.line + "]")
+        this.hasRuntimeError = true
     }
 }
 
