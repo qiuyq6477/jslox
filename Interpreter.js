@@ -1,8 +1,15 @@
 const { TokenType, Token } = require("./Token")
+const RuntimeError = require('./RuntimeError')
+const Environment = require('./Environment')
 
 
 class Interpreter {
     
+    constructor()
+    {
+        this.env = new Environment()
+    }
+
     interpret(statements)
     {
         for (const statement of statements) {
@@ -13,6 +20,20 @@ class Interpreter {
     execute(statement)
     {
         statement.accept(this)
+    }
+
+    executeBlock(statements, env)
+    {
+        let previous = this.env
+        try {
+            this.env = env
+            for (const statement of statements) {
+                this.execute(statement)
+            }
+        }
+        finally {
+            this.env = previous
+        }
     }
 
     visitExpressionStmt(stmt)
@@ -26,6 +47,30 @@ class Interpreter {
         const value = this.evaluate(stmt.expression)
         console.log(value)
         return null
+    }
+
+    visitVarStmt(stmt)
+    {
+        let value = null
+        if(stmt.initialize != null)
+        {
+            value = this.evaluate(stmt.initialize)
+        }    
+        this.env.define(stmt.name.lexeme, value)
+        return null 
+    }
+
+    visitBlockStmt(stmt)
+    {
+        this.executeBlock(stmt.statements, new Environment(this.env))
+        return null
+    }
+
+    visitAssignExpr(expr)
+    {
+        const value = this.evaluate(expr.value)
+        this.env.assign(expr.name, value)
+        return value
     }
 
     visitBinaryExpr (expr) 
@@ -106,6 +151,11 @@ class Interpreter {
         return null
     }
 
+    visitVariableExpr(expr)
+    {
+        return this.env.get(expr.name)
+    }
+
     checkNumberOperand(operator, operand)
     {
         if(typeof operand == "number") return
@@ -140,15 +190,6 @@ class Interpreter {
     isEqual(left, right)
     {
         return left === right
-    }
-}
-
-
-class RuntimeError extends Error {
-    constructor (token, message) 
-    {
-        super(message)
-        this.token = token
     }
 }
 

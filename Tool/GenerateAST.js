@@ -7,16 +7,20 @@ class GenerateAST {
     constructor(outputDir)
     {
         this.defineAST(outputDir, "Expr", {
+            Assign   : "Token name, Expr value",
             Binary   : "Expr left, Token operator, Expr right",
             Grouping : "Expr expression",
             Literal  : "Object value",
             Unary    : "Token operator, Expr right",
             Ternary  : "Expr condition, Expr left, Expr right",
+            Variable : "Token name",
         })
 
         this.defineAST(outputDir, "Stmt", {
+            Block    : "List statements",
             Expression:"Expr expression",
-            Print    : "Expr expression"
+            Print    : "Expr expression",
+            Var      : "Token name, Expr initialize"
         })
     }
 
