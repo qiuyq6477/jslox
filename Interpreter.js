@@ -29,26 +29,26 @@ class Interpreter {
                 this.checkNumberOperands(expr.operator, left, right)
                 return left * right
             case TokenType.PLUS: 
-                if (typeof left === 'number' || typeof right === 'number') 
-                {
-                    return Number(left) + Number(right)
-                }
-                if (typeof left === 'string' && typeof right === 'string') 
+                if (typeof left === 'string' || typeof right === 'string') 
                 {
                     return left + right
                 }
-                throw new RuntimeError(expr.operator, 'Operands must be two numbers or two strings.')
+                if (typeof left === 'number' && typeof right === 'number') 
+                {
+                    return Number(left) + Number(right)
+                }
+                throw new RuntimeError(expr.operator, 'Operands must be two numbers or one strings.')
             case TokenType.GREATER: 
-                this.checkNumberOperands(expr.operator, left, right)
+                this.checkOperands(expr.operator, left, right, "number", "string")
                 return left > right
             case TokenType.GREATER_EQUAL: 
-                this.checkNumberOperands(expr.operator, left, right)
+                this.checkOperands(expr.operator, left, right, "number", "string")
                 return left >= right
             case TokenType.LESS: 
-                this.checkNumberOperands(expr.operator, left, right)
+                this.checkOperands(expr.operator, left, right, "number", "string")
                 return left < right
             case TokenType.LESS_EQUAL: 
-                this.checkNumberOperands(expr.operator, left, right)
+                this.checkOperands(expr.operator, left, right, "number", "string")
                 return left <= right
             case TokenType.BANG_EQUAL: return !this.isEqual(left, right)
             case TokenType.EQUAL_EQUAL: return this.isEqual(left, right)
@@ -96,6 +96,14 @@ class Interpreter {
     checkNumberOperands (operator, left, right) {
         if (typeof left === 'number' && typeof right === 'number') return
         throw new RuntimeError(operator, 'Operands must be a numbers.')
+    }
+
+    checkOperands (operator, left, right, operandTypes) {
+        const types = Array.prototype.slice.call(arguments, 3)
+        for (const type of types) {
+            if (typeof left === type && typeof right === type) return
+        }
+        throw new RuntimeError(operator, 'Operands must be oneof [' + operandTypes + "].")    
     }
 
     evaluate(expr)

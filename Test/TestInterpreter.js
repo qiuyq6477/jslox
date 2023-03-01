@@ -5,7 +5,7 @@ const AstPrinter = require("../AstPrinter")
 const Interpreter = require("../Interpreter")
 
 const scanner = new Scanner(`
-                    1 + 1 > 1
+                    "1" <= "1"
                 `)
 const tokens = scanner.scanTokens()
 
