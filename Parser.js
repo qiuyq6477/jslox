@@ -75,9 +75,32 @@ class Parser {
         {
             return new Stmt.Block(this.block())
         }
+        if (this.match(TokenType.BREAK)) 
+        {
+            return this.breakStatement()
+        }
+        if (this.match(TokenType.CONTINUE)) 
+        {
+            return this.continueStatement()
+        }
         return this.expressionStatement()
     }
     
+    breakStatement()
+    {
+        let keyword = this.previous()
+        this.consume(TokenType.SEMICOLON, "Expect ';' after break statement")
+        return new Stmt.Break(keyword)
+    }
+
+
+    continueStatement()
+    {
+        let keyword = this.previous()
+        this.consume(TokenType.SEMICOLON, "Expect ';' after continue statement")
+        return new Stmt.Continue(keyword)
+    }
+
     // forStmt        → "for" "(" ( varDecl | exprStmt | ";" )
     //                  expression? ";"
     //                  expression? ")" statement ;

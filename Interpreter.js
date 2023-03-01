@@ -1,6 +1,7 @@
 const { TokenType, Token } = require("./Token")
 const RuntimeError = require('./RuntimeError')
 const Environment = require('./Environment')
+const Expr = require('./Expr')
 
 
 class Interpreter {
@@ -8,6 +9,8 @@ class Interpreter {
     constructor()
     {
         this.env = new Environment()
+
+        this.loop_state = null
     }
 
     interpret(statements)
@@ -29,11 +32,35 @@ class Interpreter {
             this.env = env
             for (const statement of statements) {
                 this.execute(statement)
+                if(this.loop_state == "break")
+                {
+                    break
+                }
             }
         }
         finally {
             this.env = previous
         }
+    }
+
+    visitBreakStmt(stmt)
+    {
+        if(this.loop_state)
+        {
+            this.loop_state = "break"
+            return
+        }
+        throw new RuntimeError(stmt, "break must be in loop.")
+    }
+
+    visitContinueStmt(stmt)
+    {
+        if(this.loop_state)
+        {
+            this.loop_state = "continue"
+            return
+        }
+        throw new RuntimeError(stmt, "continue must be in loop")
     }
 
     visitExpressionStmt(stmt)
@@ -54,9 +81,16 @@ class Interpreter {
 
     visitWhileStmt(stmt)
     {
-        while (this.isTruthy(this.evaluate(stmt.condition))) {
+        while (this.isTruthy(this.evaluate(stmt.condition))) 
+        {
+            this.loop_state = "loop"
             this.execute(stmt.body);
-          }
+            if(this.loop_state == "break")
+            {
+                break
+            }
+        }
+        this.loop_state = null
         return null;
     }
 

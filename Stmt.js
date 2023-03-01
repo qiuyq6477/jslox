@@ -74,11 +74,35 @@ class While extends Stmt {
   }
 }
 
+class Break extends Stmt {
+  constructor (name) {
+    super()
+    this.name = name
+  }
+
+  accept (visitor) {
+    return visitor.visitBreakStmt(this)
+  }
+}
+
+class Continue extends Stmt {
+  constructor (name) {
+    super()
+    this.name = name
+  }
+
+  accept (visitor) {
+    return visitor.visitContinueStmt(this)
+  }
+}
+
 module.exports = {
   Block,
   Expression,
   If,
   Print,
   Var,
-  While
+  While,
+  Break,
+  Continue
 }

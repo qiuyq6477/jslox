@@ -15,13 +15,12 @@ const scanner = new Scanner(`
                     //     print a;
                     // }
 
-                    var a = 0;
                     var temp;
 
-                    for (var b = 1; a < 10000; b = temp + b) {
+                    for (var a = 1; a < 10; a = a+1) {
+                        if(a == 5)
+                            break;
                         print a;
-                        temp = a;
-                        a = b;
                     }
                 `)
 const tokens = scanner.scanTokens()

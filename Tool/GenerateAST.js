@@ -24,6 +24,8 @@ class GenerateAST {
             Print    : "Expr expression",
             Var      : "Token name, Expr initialize",
             While    : "Expr condition, Stmt body",
+            Break    : "Token name",
+            Continue : "Token name",
         })
     }
 
