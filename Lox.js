@@ -49,9 +49,9 @@ class Lox {
         const tokens = scanner.scanTokens()
 
         const parser = new Parser(tokens)
-        const expression = parser.parse()
+        const statements = parser.parse()
         if(this.hasError || this.hasRuntimeError) return
-        this.interpreter(expression)
+        this.interpreter(statements)
     }
 
 

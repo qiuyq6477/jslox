@@ -1,5 +1,6 @@
 const {TokenType, Token} = require("./Token")
 const Expr = require("./Expr")
+const Stmt = require("./Stmt")
 const Lox = require("./Lox")
 
 class Parser {
@@ -11,11 +12,38 @@ class Parser {
 
     parse()
     {
-        // try {
-            return this.expression()
-        // } catch (error) {
-        //     return null
-        // }
+        let statements = []
+
+        while(!this.isAtEnd())
+        {
+            statements.push(this.statement())
+        }
+
+        return statements
+    }
+
+    statement()
+    {
+        if(this.match(TokenType.PRINT))
+        {
+            return this.printStatement()   
+        }
+        return this.expressionStatement()
+    }
+
+
+    printStatement()
+    {
+        const value = this.expression()
+        this.consume(TokenType.SEMICOLON, "Expect ';' after value.")
+        return new Stmt.Print(value)
+    }
+
+    expressionStatement()
+    {
+        const expression = this.expression()
+        this.consume(TokenType.SEMICOLON, "Expect ';' after expression.")
+        return new Stmt.Expression(expression)
     }
 
     // expression     → equality ( "," equality )* ;

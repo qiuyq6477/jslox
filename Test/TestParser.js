@@ -9,6 +9,6 @@ const scanner = new Scanner(`
 const tokens = scanner.scanTokens()
 
 const parser = new Parser(tokens,)
-const expression = parser.parse()
+const statements = parser.parse()
 if(Lox.hasError) return
-console.log(new AstPrinter().print(expression))
+console.log(new AstPrinter().print(statements))

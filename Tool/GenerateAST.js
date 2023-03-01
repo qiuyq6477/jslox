@@ -13,6 +13,11 @@ class GenerateAST {
             Unary    : "Token operator, Expr right",
             Ternary  : "Expr condition, Expr left, Expr right",
         })
+
+        this.defineAST(outputDir, "Stmt", {
+            Expression:"Expr expression",
+            Print    : "Expr expression"
+        })
     }
 
     defineAST(outputDir, baseName, types)

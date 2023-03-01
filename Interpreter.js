@@ -3,10 +3,29 @@ const { TokenType, Token } = require("./Token")
 
 class Interpreter {
     
-    interpret(expression)
+    interpret(statements)
     {
-        const value = this.evaluate(expression)
+        for (const statement of statements) {
+            this.execute(statement)
+        }
+    }
+
+    execute(statement)
+    {
+        statement.accept(this)
+    }
+
+    visitExpressionStmt(stmt)
+    {
+        this.evaluate(stmt.expression)
+        return null
+    }
+
+    visitPrintStmt(stmt)
+    {
+        const value = this.evaluate(stmt.expression)
         console.log(value)
+        return null
     }
 
     visitBinaryExpr (expr) 
