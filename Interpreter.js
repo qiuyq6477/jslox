@@ -153,7 +153,12 @@ class Interpreter {
 
     visitVariableExpr(expr)
     {
-        return this.env.get(expr.name)
+        const value = this.env.get(expr.name)
+        if(value == null)
+        {
+            throw new RuntimeError(expr, "Varialbe " + expr.name.lexeme + " must be init.")
+        }
+        return value
     }
 
     checkNumberOperand(operator, operand)
