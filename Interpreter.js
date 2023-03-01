@@ -42,6 +42,24 @@ class Interpreter {
         return null
     }
 
+    visitIfStmt(stmt)
+    {
+        if (this.isTruthy(this.evaluate(stmt.condition))) {
+            this.execute(stmt.thenBranch);
+        } else if (stmt.elseBranch != null) {
+            this.execute(stmt.elseBranch);
+        }
+        return null;
+    }
+
+    visitWhileStmt(stmt)
+    {
+        while (this.isTruthy(this.evaluate(stmt.condition))) {
+            this.execute(stmt.body);
+          }
+        return null;
+    }
+
     visitPrintStmt(stmt)
     {
         const value = this.evaluate(stmt.expression)
@@ -134,6 +152,26 @@ class Interpreter {
     visitLiteralExpr (expr) 
     {
         return expr.value
+    }
+
+    visitLogicalExpr (expr)
+    {
+        const left = this.evaluate(expr.left)
+        if(expr.operand.type == TokenType.OR)
+        {
+            if(this.isTruthy(left))
+            {
+                return left
+            }
+        }
+        else if(expr.operand.type == TokenType.AND)
+        {
+            if(!this.isTruthy(left))
+            {
+                return left
+            }
+        }
+        return this.evaluate(expr.right)
     }
 
     visitUnaryExpr (expr) 

@@ -51,6 +51,19 @@ class Literal extends Expr {
   }
 }
 
+class Logical extends Expr {
+  constructor (left, token, right) {
+    super()
+    this.left = left
+    this.token = token
+    this.right = right
+  }
+
+  accept (visitor) {
+    return visitor.visitLogicalExpr(this)
+  }
+}
+
 class Unary extends Expr {
   constructor (operator, right) {
     super()
@@ -92,6 +105,7 @@ module.exports = {
   Binary,
   Grouping,
   Literal,
+  Logical,
   Unary,
   Ternary,
   Variable

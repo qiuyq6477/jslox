@@ -48,13 +48,28 @@ class Parser {
 
 
     // statement      → exprStmt
+    //                | ifStmt
+    //                | whileStmt
+    //                | forStmt
     //                | printStmt ;
-    //                | "{" declaration* "}"
+    //                | block
     statement()
     {
+        if(this.match(TokenType.FOR))
+        {
+            return this.forStatement()
+        }
+        if(this.match(TokenType.IF))
+        {
+            return this.ifStatement()
+        }
         if(this.match(TokenType.PRINT))
         {
             return this.printStatement()   
+        }
+        if(this.match(TokenType.WHILE))
+        {
+            return this.whileStatement()   
         }
         if(this.match(TokenType.LEFT_BRACE))
         {
@@ -62,7 +77,87 @@ class Parser {
         }
         return this.expressionStatement()
     }
+    
+    // forStmt        → "for" "(" ( varDecl | exprStmt | ";" )
+    //                  expression? ";"
+    //                  expression? ")" statement ;
+    forStatement()
+    {
+        this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
 
+        let initializer;
+        if (this.match(TokenType.SEMICOLON)) 
+        {
+            initializer = null;
+        } else if (this.match(TokenType.VAR)) 
+        {
+            initializer = this.varDeclaration();
+        } else 
+        {
+            initializer = this.expressionStatement();
+        }
+
+        let condition = null;
+        if (!this.check(TokenType.SEMICOLON)) 
+        {
+            condition = this.expression();
+        }
+        this.consume(TokenType.SEMICOLON, "Expect ';' after loop condition.");
+
+        let increment = null;
+        if (!this.check(TokenType.RIGHT_PAREN)) 
+        {
+            increment = this.expression();
+        }
+        this.consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
+
+        let body = this.statement();
+
+        if (increment != null) 
+        {
+            body = new Stmt.Block([body, new Stmt.Expression(increment)]);
+        }
+        if (condition == null) 
+        {
+            condition = new Expr.Literal(true);
+        }
+        body = new Stmt.While(condition, body);
+        if (initializer != null) 
+        {
+            body = new Stmt.Block([initializer, body]);
+        }
+        return body;
+    }
+
+    // whileStmt      → "while" "(" expression ")" statement ;
+    whileStatement()
+    {
+        this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
+        const condition = this.expression();
+        this.consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
+        const body = this.statement();
+    
+        return new Stmt.While(condition, body);
+    }
+
+    // ifStmt         → "if" "(" expression ")" statement
+    //                ( "else" statement )? ;
+    ifStatement()
+    {
+        this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.")
+        const condition = this.expression();
+        this.consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition."); 
+
+        const thenBranch = this.statement();
+        let elseBranch = null;
+        if (this.match(TokenType.ELSE)) {
+            elseBranch = this.statement();
+        }
+
+        return new Stmt.If(condition, thenBranch, elseBranch);
+    }
+
+    // block          → "{" declaration* "}" ;
     block()
     {
         let statements = []
@@ -95,11 +190,12 @@ class Parser {
     }
 
     // assignment     → IDENTIFIER "=" assignment
-    //                | equality ( "," equality )* ;
-    //                | equality "?" equality ":" equality ;
+    //                | logic_or ( "," logic_or )* ;
+    //                | logic_or "?" logic_or ":" logic_or ;
+    //                | logic_or
     assignment()
     {
-        let expr = this.equality()
+        let expr = this.logic_or()
         
         if(this.match(TokenType.EQUAL))
         {
@@ -117,18 +213,44 @@ class Parser {
 
         while(this.match(TokenType.COMMA))
         {
-            expr = this.equality()
+            expr = this.logic_or()
         }
 
         while(this.match(TokenType.QUESTION_MARK))
         {
             const condition = expr
-            const left = this.equality()
+            const left = this.logic_or()
             this.consume(TokenType.COLON, "Expect ':' after expression.")
-            const right = this.equality()
+            const right = this.logic_or()
             expr = new Expr.Ternary(condition, left, right)
         }
 
+        return expr
+    }
+
+    // logic_or       → logic_and ( "or" logic_and )* ;    
+    logic_or()
+    {
+        const expr = this.logic_and()
+        while(this.match(TokenType.OR))
+        {
+            const operator = this.previous()
+            const right = this.logic_and()
+            expr = new Expr.Logical(expr, operator, right)
+        }
+        return expr
+    }
+
+    // logic_and      → equality ( "and" equality )* ;
+    logic_and()
+    {
+        const expr = this.equality()
+        while(this.match(TokenType.AND))
+        {
+            const operator = this.previous()
+            const right = this.equality()
+            expr = new Expr.Logical(expr, operator, right)
+        }
         return expr
     }
 

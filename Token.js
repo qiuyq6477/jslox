@@ -45,6 +45,7 @@ const TokenType = {
   VAR: 'var',
   WHILE: 'while',
   BREAK: 'break',
+  CONTINUE: 'continue',
     
   EOF: 'eof'
 }

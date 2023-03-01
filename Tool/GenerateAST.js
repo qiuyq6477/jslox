@@ -11,6 +11,7 @@ class GenerateAST {
             Binary   : "Expr left, Token operator, Expr right",
             Grouping : "Expr expression",
             Literal  : "Object value",
+            Logical  : "Expr left, Token token, Expr right",
             Unary    : "Token operator, Expr right",
             Ternary  : "Expr condition, Expr left, Expr right",
             Variable : "Token name",
@@ -19,8 +20,10 @@ class GenerateAST {
         this.defineAST(outputDir, "Stmt", {
             Block    : "List statements",
             Expression:"Expr expression",
+            If       : "Expr condition, Stmt thenBranch, Stmt elseBrance",
             Print    : "Expr expression",
-            Var      : "Token name, Expr initialize"
+            Var      : "Token name, Expr initialize",
+            While    : "Expr condition, Stmt body",
         })
     }
 

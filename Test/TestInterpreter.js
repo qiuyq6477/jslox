@@ -9,10 +9,19 @@ const scanner = new Scanner(`
                     print "hello world";
                     print 1+2;
 
-                    var a = 1;
-                    {
-                        var a = a + 1;
+                    // var a = 1;
+                    // {
+                    //     var a = a + 1;
+                    //     print a;
+                    // }
+
+                    var a = 0;
+                    var temp;
+
+                    for (var b = 1; a < 10000; b = temp + b) {
                         print a;
+                        temp = a;
+                        a = b;
                     }
                 `)
 const tokens = scanner.scanTokens()
