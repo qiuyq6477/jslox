@@ -32,7 +32,7 @@ class Interpreter {
             this.env = env
             for (const statement of statements) {
                 this.execute(statement)
-                if(this.loop_state == "break")
+                if(this.loop_state == "break" || this.loop_state == "continue")
                 {
                     break
                 }
@@ -89,6 +89,26 @@ class Interpreter {
             {
                 break
             }
+        }
+        this.loop_state = null
+        return null;
+    }
+
+    visitForStmt(stmt)
+    {
+        if(stmt.initializer)
+        {
+            this.execute(stmt.initializer);
+        }
+        while (this.isTruthy(this.evaluate(stmt.condition))) 
+        {
+            this.loop_state = "loop"
+            this.execute(stmt.body);
+            if(this.loop_state == "break")
+            {
+                break
+            }
+            this.execute(stmt.increment);
         }
         this.loop_state = null
         return null;

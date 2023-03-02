@@ -136,20 +136,7 @@ class Parser {
 
         let body = this.statement();
 
-        if (increment != null) 
-        {
-            body = new Stmt.Block([body, new Stmt.Expression(increment)]);
-        }
-        if (condition == null) 
-        {
-            condition = new Expr.Literal(true);
-        }
-        body = new Stmt.While(condition, body);
-        if (initializer != null) 
-        {
-            body = new Stmt.Block([initializer, body]);
-        }
-        return body;
+        return new Stmt.For(initializer, condition, increment, body);
     }
 
     // whileStmt      → "while" "(" expression ")" statement ;
