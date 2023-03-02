@@ -291,6 +291,11 @@ class Interpreter {
         return value
     }
 
+    visitLambdaExpr(expr)
+    {
+        return new LoxFunction(expr, this.env)
+    }
+
     checkNumberOperand(operator, operand)
     {
         if(typeof operand == "number") return

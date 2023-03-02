@@ -42,6 +42,19 @@ class Call extends Expr {
   }
 }
 
+class Lambda extends Expr {
+  constructor (name, params, body) {
+    super()
+    this.name = name
+    this.params = params
+    this.body = body
+  }
+
+  accept (visitor) {
+    return visitor.visitLambdaExpr(this)
+  }
+}
+
 class Grouping extends Expr {
   constructor (expression) {
     super()
@@ -117,6 +130,7 @@ module.exports = {
   Assign,
   Binary,
   Call,
+  Lambda,
   Grouping,
   Literal,
   Logical,

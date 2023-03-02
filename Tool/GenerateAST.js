@@ -10,6 +10,7 @@ class GenerateAST {
             Assign   : "Token name, Expr value",
             Binary   : "Expr left, Token operator, Expr right",
             Call     : "Expr callee, Token paren, List args",
+            Lambda   : "Token name, List params, List body",
             Grouping : "Expr expression",
             Literal  : "Object value",
             Logical  : "Expr left, Token token, Expr right",

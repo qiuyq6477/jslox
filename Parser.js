@@ -30,7 +30,10 @@ class Parser {
     {
         if(this.match(TokenType.FUN))
         {
-            return this.function("function")
+            if(this.peek().type == TokenType.IDENTIFIER)
+            {
+                return this.function("function")
+            }
         }
         if(this.match(TokenType.VAR))
         {
@@ -435,21 +438,48 @@ class Parser {
         if (this.match(TokenType.TRUE)) return new Expr.Literal(true)
         if (this.match(TokenType.NIL)) return new Expr.Literal(null)
     
-        if (this.match(TokenType.NUMBER, TokenType.STRING)) {
+        if (this.match(TokenType.FUN))
+        {
+            return this.lambdaExpression()
+        }
+
+        if (this.match(TokenType.NUMBER, TokenType.STRING)) 
+        {
           return new Expr.Literal(this.previous().literal)
         }
     
-        if (this.match(TokenType.IDENTIFIER)) {
+        if (this.match(TokenType.IDENTIFIER)) 
+        {
           return new Expr.Variable(this.previous())
         }
     
-        if (this.match(TokenType.LEFT_PAREN)) {
+        if (this.match(TokenType.LEFT_PAREN)) 
+        {
           const expr = this.expression()
           this.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
           return new Expr.Grouping(expr)
         }
     
         throw this.error(this.peek(), 'Expect expression.')
+    }
+
+    lambdaExpression()
+    {
+        this.consume(TokenType.LEFT_PAREN, "Expect '(' after fn.")
+        let parameters = []
+        if (!this.check(TokenType.RIGHT_PAREN)) {
+        do {
+            if (parameters.length >= 255) {
+                this.error(this.peek(), "Can't have more than 255 parameters.")
+            }
+            parameters.push(this.consume(TokenType.IDENTIFIER, "Expect parameter name."))
+        } while (this.match(TokenType.COMMA))
+        }
+        this.consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
+
+        this.consume(TokenType.LEFT_BRACE, "Expect '{' before lambda body.");
+        const body = this.block();
+        return new Expr.Lambda("lambda", parameters, body);
     }
 
     match()
