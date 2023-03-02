@@ -26,6 +26,19 @@ class Expression extends Stmt {
   }
 }
 
+class Function extends Stmt {
+  constructor (name, params, body) {
+    super()
+    this.name = name
+    this.params = params
+    this.body = body
+  }
+
+  accept (visitor) {
+    return visitor.visitFunctionStmt(this)
+  }
+}
+
 class If extends Stmt {
   constructor (condition, thenBranch, elseBrance) {
     super()
@@ -47,6 +60,18 @@ class Print extends Stmt {
 
   accept (visitor) {
     return visitor.visitPrintStmt(this)
+  }
+}
+
+class Return extends Stmt {
+  constructor (keyword, value) {
+    super()
+    this.keyword = keyword
+    this.value = value
+  }
+
+  accept (visitor) {
+    return visitor.visitReturnStmt(this)
   }
 }
 
@@ -113,8 +138,10 @@ class Continue extends Stmt {
 module.exports = {
   Block,
   Expression,
+  Function,
   If,
   Print,
+  Return,
   Var,
   While,
   For,

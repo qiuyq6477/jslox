@@ -1,14 +1,18 @@
 const { TokenType, Token } = require("./Token")
 const RuntimeError = require('./RuntimeError')
 const Environment = require('./Environment')
-const Expr = require('./Expr')
+const Return = require('./Return')
+const {LoxCallable, LoxFunction, LocalFunction} = require('./LoxFunction')
 
 
 class Interpreter {
     
     constructor()
     {
-        this.env = new Environment()
+        this.globals = new Environment()
+        this.env = this.globals
+
+        this.globals.define("clock", new LocalFunction("clock", 0, () => { return Date.now() / 1000 }))
 
         this.loop_state = null
     }
@@ -69,6 +73,13 @@ class Interpreter {
         return null
     }
 
+    visitFunctionStmt(stmt)
+    {
+        const func = new LoxFunction(stmt, this.env)
+        this.env.define(stmt.name.lexeme, func)
+        return null
+    }
+
     visitIfStmt(stmt)
     {
         if (this.isTruthy(this.evaluate(stmt.condition))) {
@@ -119,6 +130,16 @@ class Interpreter {
         const value = this.evaluate(stmt.expression)
         console.log(value)
         return null
+    }
+
+    visitReturnStmt(stmt)
+    {
+        let value = null
+        if(stmt.value) 
+        {
+            value = this.evaluate(stmt.value)
+        }
+        throw new Return(value)
     }
 
     visitVarStmt(stmt)
@@ -192,6 +213,23 @@ class Interpreter {
         }
         
         return null
+    }
+
+    visitCallExpr (expr)
+    {
+        const callee = this.evaluate(expr.callee)
+        const args = expr.args.map(arg => this.evaluate(arg))
+
+        if (!(callee instanceof LoxCallable)) {
+            throw new RuntimeError(expr.paren,
+              'Can only call functions and classes.')
+        }
+
+        if (args.length != callee.arity()) {
+            throw new RuntimeError(expr.paren, `Expected ${callee.arity()} arguments but got ${args.length}.`)
+        }
+
+        return callee.call(this, args)
     }
 
     visitTernaryExpr (expr) 

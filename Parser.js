@@ -23,14 +23,43 @@ class Parser {
     }
 
     // declaration    → varDecl
-    //                 | statement ;
+    //                | funDecl
+    //                | statement ;
+    // funDecl        → "fun" function ;
     declaration()
     {
+        if(this.match(TokenType.FUN))
+        {
+            return this.function("function")
+        }
         if(this.match(TokenType.VAR))
         {
             return this.varDeclaration()
         }
         return this.statement()
+    }
+
+    // function       → IDENTIFIER "(" parameters? ")" block ;
+    // parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
+    function(kind)
+    {
+        const name = this.consume(TokenType.IDENTIFIER, "Expect " + kind + " name.")
+        
+        this.consume(TokenType.LEFT_PAREN, "Expect '(' after " + kind + " name.")
+        let parameters = []
+        if (!this.check(TokenType.RIGHT_PAREN)) {
+        do {
+            if (parameters.length >= 255) {
+                this.error(this.peek(), "Can't have more than 255 parameters.")
+            }
+            parameters.push(this.consume(TokenType.IDENTIFIER, "Expect parameter name."))
+        } while (this.match(TokenType.COMMA))
+        }
+        this.consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
+
+        this.consume(TokenType.LEFT_BRACE, "Expect '{' before " + kind + " body.");
+        const body = this.block();
+        return new Stmt.Function(name, parameters, body);
     }
 
     varDeclaration()
@@ -51,6 +80,7 @@ class Parser {
     //                | ifStmt
     //                | whileStmt
     //                | forStmt
+    //                | returnStmt ;
     //                | printStmt ;
     //                | block
     statement()
@@ -66,6 +96,10 @@ class Parser {
         if(this.match(TokenType.PRINT))
         {
             return this.printStatement()   
+        }
+        if(this.match(TokenType.RETURN))
+        {
+            return this.returnStatement()   
         }
         if(this.match(TokenType.WHILE))
         {
@@ -186,11 +220,34 @@ class Parser {
         return new Stmt.Print(value)
     }
 
+    returnStatement()
+    {
+        const keyword = this.previous()
+        let value = null
+        if(!this.match(TokenType.SEMICOLON))
+        {
+            value = this.expression()
+        }
+        this.consume(TokenType.SEMICOLON, "Expect ';' after return value.");
+        return new Stmt.Return(keyword, value)
+    }
+
     expressionStatement()
     {
         const expression = this.expression()
         this.consume(TokenType.SEMICOLON, "Expect ';' after expression.")
         return new Stmt.Expression(expression)
+    }
+
+    // commaExpression     → expression ;
+    commaExpression()
+    {
+        let expr = this.expression()
+        while(this.match(TokenType.COMMA))
+        {
+            expr = this.expression()
+        }
+        return expr
     }
 
     // expression     → assignment ;
@@ -219,11 +276,6 @@ class Parser {
             }
 
             this.error(equals, 'Invalid assignment target.')
-        }
-
-        while(this.match(TokenType.COMMA))
-        {
-            expr = this.logic_or()
         }
 
         while(this.match(TokenType.QUESTION_MARK))
@@ -325,7 +377,7 @@ class Parser {
     }
 
     // unary          → ( "!" | "-" ) unary
-    //                  | primary ;
+    //                  | call
     unary()
     {
         if(this.match(TokenType.BANG, TokenType.MINUS))
@@ -335,7 +387,44 @@ class Parser {
             return new Expr.Unary(operator, right)
         }
 
-        return this.primary()
+        return this.call()
+    }
+
+    // call           → primary ( "(" arguments? ")" )* ;
+    call()
+    {
+        let expr = this.primary()
+
+        while(true)
+        {
+            if(this.match(TokenType.LEFT_PAREN))
+            {
+                expr = this.finishCall(expr)
+            }
+            else
+            {
+                break
+            }
+        }
+        return expr
+    }
+
+    finishCall(callee)
+    {
+        let args = []
+        if(!this.check(TokenType.RIGHT_PAREN))
+        {
+            do {
+                if(args.length >= 255)
+                {
+                    this.error(this.peek(), "Can't have more than 255 arguments.")
+                }
+                args.push(this.expression())
+            } while (this.match(TokenType.COMMA));
+        }
+
+        const paren = this.consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.")
+        return new Expr.Call(callee, paren, args)
     }
 
     // primary        → NUMBER | STRING | "true" | "false" | "nil"
