@@ -1,4 +1,4 @@
-const Scanner = require("../Scanner")
+import { Scanner } from "../Scanner.js"
 
 const scanner = new Scanner(`
                     print 'hello world'

@@ -1,6 +1,6 @@
-const AstPrinter = require("../AstPrinter")
-const Expr = require("../Expr")
-const { TokenType, Token } = require("../Token")
+import { AstPrinter } from "../AstPrinter.js";
+import * as Expr from "../Expr.js"
+import { TokenType, Token } from "../Token.js";
 
 const expression = new Expr.Binary(
     new Expr.Unary(

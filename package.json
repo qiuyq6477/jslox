@@ -1,0 +1,20 @@
+{
+  "name": "jslox",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Main.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qiuyq6477/jslox.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/qiuyq6477/jslox/issues"
+  },
+  "homepage": "https://github.com/qiuyq6477/jslox#readme"
+}

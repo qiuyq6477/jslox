@@ -1,9 +1,8 @@
-const {TokenType, Token} = require("./Token")
-const Expr = require("./Expr")
-const Stmt = require("./Stmt")
-const Lox = require("./Lox")
-
-class Parser {
+import { TokenType, Token } from "./Token.js"
+import * as Expr from "./Expr.js"
+import * as Stmt from "./Stmt.js"
+import { Lox } from "./Lox.js"
+export class Parser {
 
     constructor(tokens) {
         this.tokens = tokens
@@ -28,18 +27,26 @@ class Parser {
     // funDecl        → "fun" function ;
     declaration()
     {
-        if(this.match(TokenType.FUN))
+        try 
         {
-            if(this.peek().type == TokenType.IDENTIFIER)
+            if(this.match(TokenType.FUN))
             {
-                return this.function("function")
+                if(this.peek().type == TokenType.IDENTIFIER)
+                {
+                    return this.function("function")
+                }
             }
-        }
-        if(this.match(TokenType.VAR))
+            if(this.match(TokenType.VAR))
+            {
+                return this.varDeclaration()
+            }
+            return this.statement()
+        } 
+        catch (error) 
         {
-            return this.varDeclaration()
+            this.synchronize()
+            return null    
         }
-        return this.statement()
     }
 
     // function       → IDENTIFIER "(" parameters? ")" block ;
@@ -532,7 +539,7 @@ class Parser {
 
     error(token, message)
     {
-        Lox.error(token, message)
+        Lox.parseError(token, message)
         return new ParseError()
     }
 
@@ -562,7 +569,7 @@ class Parser {
     }
 }
 
-class ParseError extends Error {
+export class ParseError extends Error {
     constructor (message) 
     {
         super()
@@ -571,6 +578,3 @@ class ParseError extends Error {
         this.message = message
     }
 }
-
-module.exports = Parser
-  

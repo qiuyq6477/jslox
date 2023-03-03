@@ -1,6 +1,6 @@
-const Lox = require("./Lox")
+import { Lox } from "./Lox.js";
 
-console.log(process.argv)
+
 if(process.argv.length > 3)
 {
     console.log('Usage: node Lox.js [script]')

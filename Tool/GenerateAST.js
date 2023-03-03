@@ -1,5 +1,8 @@
-const fs = require('fs')
-const path = require('path')
+import fs from "fs"
+import path from "path"
+
+import { fileURLToPath } from 'url'
+const __filename = fileURLToPath(import.meta.url)
 
 const indent = '  '
 
@@ -55,7 +58,7 @@ class GenerateAST {
             `${indent}${className}`
         ).join(`,\n`)
 
-        writer.write(`module.exports = {\n`)
+        writer.write(`export {\n`)
         writer.write(allExports)
         writer.write('\n}\n')
 

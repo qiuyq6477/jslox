@@ -1,24 +1,28 @@
-const Scanner = require("../Scanner")
-const Parser = require("../Parser")
-const Lox = require("../Lox")
-const AstPrinter = require("../AstPrinter")
-const Interpreter = require("../Interpreter")
+import { Scanner } from "../Scanner.js"
+import { Parser } from "../Parser.js"
+import { Lox } from "../Lox.js"
+import { Resolver } from "../Resolver.js"
+import { Interpreter } from "../Interpreter.js"
 
-const scanner = new Scanner(`
+
+function main()
+{
+    const scanner = new Scanner(`
 
     // fun sayHi(first, last) {
     //     print "Hi, " + first + " " + last + "!";
     // }
-    
+
     // sayHi("Dear", "Reader");
 
+    // =========================================
     // var start = clock();
 
     // fun fib(n) {
     //     if (n <= 1) return n;
     //     return fib(n - 2) + fib(n - 1);
     // }
-      
+    
     // for (var i = 0; i < 20; i = i + 1) {
     //     print fib(i);
     // }
@@ -27,26 +31,40 @@ const scanner = new Scanner(`
 
     // print end - start;
 
+    // =========================================
 
-    fun makeCounter() {
-        var i = 0;
-        fun count() {
-          i = i + 1;
-          print i;
-        }
-      
-        return count;
-    }
+    // fun makeCounter() {
+    //     var i = 0;
+    //     fun count() {
+    //       i = i + 1;
+    //       print i;
+    //     }
     
-    var counter = makeCounter();
-    counter(); // "1".
-    counter(); // "2".
+    //     return count;
+    // }
 
+    // var counter = makeCounter();
+    // counter(); // "1".
+    // counter(); // "2".
+
+    // =========================================
+    var a = "global";
+    fun scope(a) {
+        var a = "local";
+        print a;
+    }
+    scope(a);
                 `)
-const tokens = scanner.scanTokens()
+    const tokens = scanner.scanTokens()
 
-const parser = new Parser(tokens,)
-const statements = parser.parse()
-if(Lox.hasError) return
-const interpreter = new Interpreter()
-interpreter.interpret(statements)
+    const parser = new Parser(tokens)
+    const statements = parser.parse()
+    if(Lox.hasError) return
+    const interpreter = new Interpreter()
+    const resolver = new Resolver(interpreter)
+    resolver.resolve(statements)
+    if(Lox.hasError) return
+    interpreter.interpret(statements)
+}
+
+main()

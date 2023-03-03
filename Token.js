@@ -1,4 +1,4 @@
-const TokenType = {
+export const TokenType = {
   LEFT_PAREN: '(',
   RIGHT_PAREN: ')',
   LEFT_BRACE: '{',
@@ -51,7 +51,7 @@ const TokenType = {
 }
   
 //TODO:还可以包含列位置和长度
-function Token(type, lexeme, literal, line) {
+export function Token(type, lexeme, literal, line) {
   this.type = type
   this.lexeme = lexeme
   this.literal = literal
@@ -62,4 +62,3 @@ Token.prototype.toString = function tokenToString() {
   return `${this.type} ${this.lexeme} ${this.literal}`
 }
 
-module.exports = { TokenType, Token }

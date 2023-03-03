@@ -1,4 +1,4 @@
-class RpnPrinter {
+export class RpnPrinter {
     print (expr) 
     {
         return expr.accept(this)
@@ -43,5 +43,3 @@ class RpnPrinter {
         return str
     }
 }
-  
-module.exports = RpnPrinter

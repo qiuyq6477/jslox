@@ -1,11 +1,11 @@
-const fs = require("fs")
-const readline = require("readline")
-const Scanner = require("./Scanner")
-const Parser = require("./Parser")
-const AstPrinter = require("./AstPrinter")
-const Interpreter = require("./Interpreter")
+import "fs"
+import "readline"
+import { Scanner } from "./Scanner.js"
+import { Parser } from "./Parser.js"
+import { TokenType } from "./Token.js"
+import { Interpreter } from "./Interpreter.js"
 
-class Lox {
+export class Lox {
     static interpreter = new Interpreter()
     constructor(){
     }
@@ -68,7 +68,7 @@ class Lox {
      */
     static hasError = false
     static hasRuntimeError = false
-    static error(line, message)
+    static errorLine(line, message)
     {
         this.report(line, "", message)
     }
@@ -77,10 +77,11 @@ class Lox {
     {
         if (token.type == TokenType.EOF) 
         {
-            report(token.line, " at end", message);
-        } else 
+            this.report(token.line, " at end", message);
+        } 
+        else 
         {
-            report(token.line, " at '" + token.lexeme + "'", message);
+            this.report(token.line, " at '" + token.lexeme + "'", message);
         }
     }
 
@@ -96,5 +97,3 @@ class Lox {
         this.hasRuntimeError = true
     }
 }
-
-module.exports = Lox

@@ -1,12 +1,13 @@
-const Return = require("./Return")
-const Environment = require("./Environment")
+import { Return } from "./Return.js"
+import { Environment } from "./Environment.js"
 
-class LoxCallable {
+
+export class LoxCallable {
     arity () { return this._arity }
     call (interpreter, args) {}
 }
 
-class LoxFunction extends LoxCallable {
+export class LoxFunction extends LoxCallable {
     constructor (declaration, closure) 
     {
         super()
@@ -51,7 +52,7 @@ class LoxFunction extends LoxCallable {
     }
 }
 
-class LocalFunction extends LoxCallable {
+export class LocalFunction extends LoxCallable {
     constructor (name, arity, fn) 
     {
         super()
@@ -69,10 +70,4 @@ class LocalFunction extends LoxCallable {
     {
         return this._fn.apply(null, args)
     }
-}
-
-module.exports = {
-    LoxCallable,
-    LoxFunction,
-    LocalFunction,
 }

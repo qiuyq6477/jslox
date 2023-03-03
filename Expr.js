@@ -126,7 +126,7 @@ class Variable extends Expr {
   }
 }
 
-module.exports = {
+export {
   Assign,
   Binary,
   Call,

@@ -1,6 +1,6 @@
-const RpnPrinter = require("../RpnPrinter")
-const Expr = require("../Expr")
-const { TokenType, Token } = require("../Token")
+import * as Expr from "../Expr.js"
+import { RpnPrinter } from "../RpnPrinter.js";
+import { TokenType, Token } from "../Token.js";
 
 const expression = new Expr.Binary(
     new Expr.Unary(

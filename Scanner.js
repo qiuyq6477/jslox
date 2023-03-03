@@ -1,6 +1,5 @@
-const { TokenType, Token } = require('./Token')
-const Lox = require("./Lox")
-
+import { Lox } from "./Lox.js"
+import { TokenType, Token } from "./Token.js"
 const keywords = {
     'and': TokenType.AND,
     'class': TokenType.CLASS,
@@ -22,7 +21,7 @@ const keywords = {
     'continue': TokenType.CONTINUE,
 }
 
-class Scanner {
+export class Scanner {
 
     constructor(source) {
         this.source = source
@@ -98,7 +97,7 @@ class Scanner {
                     this.identifier();
                 }
                 else {
-                    Lox.error(this.line, "Unexpected character." + c);
+                    Lox.errorLine(this.line, "Unexpected character." + c);
                 }
                 break;
         }
@@ -111,7 +110,7 @@ class Scanner {
         }
 
         if (this.isAtEnd()) {
-            Lox.error(this.line, "Unterminated string.");
+            Lox.errorLine(this.line, "Unterminated string.");
             return;
         }
 
@@ -209,5 +208,3 @@ class Scanner {
         }
     }
 }
-
-module.exports = Scanner

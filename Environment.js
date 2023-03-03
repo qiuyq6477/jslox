@@ -1,6 +1,5 @@
-const RuntimeError = require('./RuntimeError')
-
-module.exports = class Environment {
+import { RuntimeError } from './RuntimeError.js'
+export class Environment {
     constructor (enclosing) {
         this.enclosing = enclosing || null
         this.values = {}
@@ -35,5 +34,26 @@ module.exports = class Environment {
 
         throw new RuntimeError(name,
             "Undefined variable '" + name.lexeme + "'.")
+    }
+
+    getAt(distance, name)
+    {
+        const env = this.ancestor(distance)
+        return env.values[name.lexeme]
+    }
+
+    assignAt(distance, name, value)
+    {
+        const env = this.ancestor(distance)
+        env.values[name.lexeme] = value
+    }
+
+    ancestor(distance) {
+        let environment = this;
+        for (let i = 0; i < distance; i++) {
+            environment = environment.enclosing; 
+        }
+    
+        return environment;
     }
 }

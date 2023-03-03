@@ -4,27 +4,15 @@ import { Lox } from "../Lox.js"
 import { Resolver } from "../Resolver.js"
 import { Interpreter } from "../Interpreter.js"
 
-
 function main()
 {
-        
     const scanner = new Scanner(`
-
-    var sayHi = fun(first, last) {
-        print "Hi, " + first + " " + last + "!";
-    };
-
-    sayHi("Dear", "Reader");
-
-    fun thrice(fn) {
-        for (var i = 1; i <= 3; i = i + 1) {
-        fn(i);
-        }
-    }
-    
-    thrice(fun (a) {
+    var a = "global";
+    fun scope(a) {
+        a = "local";
         print a;
-    });
+    }
+    scope(a);
                 `)
     const tokens = scanner.scanTokens()
 

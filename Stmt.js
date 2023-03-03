@@ -135,7 +135,7 @@ class Continue extends Stmt {
   }
 }
 
-module.exports = {
+export {
   Block,
   Expression,
   Function,

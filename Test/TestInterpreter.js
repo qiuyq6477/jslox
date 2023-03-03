@@ -1,18 +1,22 @@
-const Scanner = require("../Scanner")
-const Parser = require("../Parser")
-const Lox = require("../Lox")
-const AstPrinter = require("../AstPrinter")
-const Interpreter = require("../Interpreter")
+import { Scanner } from "../Scanner.js"
+import { Parser } from "../Parser.js"
+import { Lox } from "../Lox.js"
+import { Interpreter } from "../Interpreter.js"
 
-const scanner = new Scanner(`
+function main()
+{
+    const scanner = new Scanner(`
                     "1" <= "1";
                     print "hello world";
                     print 1+2;
                 `)
-const tokens = scanner.scanTokens()
+    const tokens = scanner.scanTokens()
 
-const parser = new Parser(tokens,)
-const statements = parser.parse()
-if(Lox.hasError) return
-const interpreter = new Interpreter()
-interpreter.interpret(statements)
+    const parser = new Parser(tokens)
+    const statements = parser.parse()
+    if(Lox.hasError) return
+    const interpreter = new Interpreter()
+    interpreter.interpret(statements)
+}
+
+main()

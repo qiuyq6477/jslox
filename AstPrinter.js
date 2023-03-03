@@ -1,5 +1,5 @@
 
-class AstPrinter {
+export class AstPrinter {
     print (expr) 
     {
         return expr.accept(this)
@@ -43,5 +43,3 @@ class AstPrinter {
         return str
     }
 }
-
-module.exports = AstPrinter
