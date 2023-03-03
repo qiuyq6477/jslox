@@ -47,6 +47,12 @@ const FunctionType = {
     "FUNCTION" : "FUNCTION",
     "LAMBDA" : "LAMBDA",
 }
+
+const LoopType = {
+    "NONE" : "NONE",
+    "FOR" : "FOR",
+    "WHILE" : "WHILE",
+}
   
 export class Resolver {
 
@@ -55,6 +61,7 @@ export class Resolver {
         this.interpreter = interpreter
         this.scopes = new Stack()
         this.currentFunction = FunctionType.NONE
+        this.currentLoop = LoopType.NONE
     }
 
     visitBlockStmt(stmt)
@@ -113,27 +120,39 @@ export class Resolver {
 
     visitForStmt(stmt)
     {
+        this.currentLoop = LoopType.FOR
         this.resolveExpression(stmt.initializer)
         this.resolveExpression(stmt.condition)
         this.resolveExpression(stmt.increment)
         this.resolveExpression(stmt.body)
+        this.currentLoop = LoopType.NONE
         return null
     }
 
     visitWhileStmt(stmt)
     {
+        this.currentLoop = LoopType.WHILE
         this.resolveExpression(stmt.condition)
         this.resolveExpression(stmt.body)
+        this.currentLoop = LoopType.NONE
         return null
     }
 
     visitBreakStmt(stmt)
     {
+        if(this.currentLoop == LoopType.NONE)
+        {
+            Lox.parseError(stmt.name, "Only break in loop.")
+        }
         return null
     }
 
     visitContinueStmt(stmt)
     {
+        if(this.currentLoop == LoopType.NONE)
+        {
+            Lox.parseError(stmt.name, "Only continue in loop.")
+        }
         return null
     }
 
@@ -153,13 +172,6 @@ export class Resolver {
         {
             this.resolveExpression(stmt.value)
         }
-        return null
-    }
-
-    visitWhileStmt(stmt)
-    {
-        this.resolveExpression(stmt.condition)
-        this.resolveExpression(stmt.body)
         return null
     }
 
