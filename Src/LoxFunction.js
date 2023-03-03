@@ -3,11 +3,12 @@ import { Environment } from "./Environment.js"
 import { LoxCallable } from "./LoxCallable.js"
 
 export class LoxFunction extends LoxCallable {
-    constructor (declaration, closure) 
+    constructor (declaration, closure, isInitializer) 
     {
         super()
         this.closure = closure
         this.declaration = declaration
+        this.isInitializer = isInitializer
     }
   
     arity () 
@@ -36,6 +37,10 @@ export class LoxFunction extends LoxCallable {
         {
             if (err instanceof Return) 
             {
+                if (this.isInitializer)
+                {
+                    return closure.getAt(0, "this");
+                } 
                 return err.value
             } 
             else 
@@ -43,7 +48,20 @@ export class LoxFunction extends LoxCallable {
                 throw err
             }
         }
+
+        if (this.isInitializer)
+        {
+            return this.closure.getAt(0, "this");
+        } 
+
         return null
+    }
+
+    bind (instance)
+    {
+        const env = new Environment(this.closure)
+        env.define("this", instance)
+        return new LoxFunction(this.declaration, env, this.isInitializer)
     }
 }
 

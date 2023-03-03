@@ -305,7 +305,7 @@ export class Parser {
         return this.assignment()
     }
 
-    // assignment     → IDENTIFIER "=" assignment
+    // assignment     → ( call "." )? IDENTIFIER "=" assignment
     //                | logic_or ( "," logic_or )* ;
     //                | logic_or "?" logic_or ":" logic_or ;
     //                | logic_or
@@ -317,11 +317,15 @@ export class Parser {
         {
             const equals = this.previous()
             const value = this.assignment()
+            const name = expr.name
 
             if(expr instanceof Expr.Variable)
             {
-                const name = expr.name
                 return new Expr.Assign(name, value)
+            }
+            else if(expr instanceof Expr.Get)
+            {
+                return new Expr.Set(expr.object, name, value)
             }
 
             this.error(equals, 'Invalid assignment target.')
@@ -439,7 +443,7 @@ export class Parser {
         return this.call()
     }
 
-    // call           → primary ( "(" arguments? ")" )* ;
+    // call           → primary ( "(" arguments? ")"  | "." IDENTIFIER )* ;
     call()
     {
         let expr = this.primary()
@@ -449,6 +453,11 @@ export class Parser {
             if(this.match(TokenType.LEFT_PAREN))
             {
                 expr = this.finishCall(expr)
+            }
+            else if(this.match(TokenType.DOT))
+            {
+                const name = this.consume(TokenType.IDENTIFIER, "Expect property name after '.'.")
+                expr = new Expr.Get(expr, name)
             }
             else
             {
@@ -485,7 +494,8 @@ export class Parser {
         if (this.match(TokenType.FALSE)) return new Expr.Literal(false)
         if (this.match(TokenType.TRUE)) return new Expr.Literal(true)
         if (this.match(TokenType.NIL)) return new Expr.Literal(null)
-    
+        if (this.match(TokenType.THIS)) return new Expr.This(this.previous())
+
         if (this.match(TokenType.FUN))
         {
             return this.lambdaExpression()

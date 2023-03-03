@@ -45,7 +45,9 @@ function Stack() {
 const FunctionType = {
     "NONE" : "NONE",
     "FUNCTION" : "FUNCTION",
+    "METHOD" : "METHOD",
     "LAMBDA" : "LAMBDA",
+    "INITIALIZER" : "INITIALIZER",
 }
 
 const LoopType = {
@@ -54,6 +56,10 @@ const LoopType = {
     "WHILE" : "WHILE",
 }
   
+const ClassType = {
+    "NONE" : "NONE",
+    "CLASS" : "CLASS",
+}
 
 /**
  * TODO:
@@ -71,6 +77,7 @@ export class Resolver {
         this.scopes = new Stack()
         this.currentFunction = FunctionType.NONE
         this.currentLoop = LoopType.NONE
+        this.currentClass = ClassType.NONE
     }
 
     visitBlockStmt(stmt)
@@ -93,8 +100,23 @@ export class Resolver {
 
     visitClassStmt(stmt)
     {
+        let enclosingClass = this.currentClass;
+        this.currentClass = ClassType.CLASS;
+
         this.declare(stmt.name)
         this.define(stmt.name)
+        this.beginScope()
+        this.scopes.peek()["this"] = true
+        for (const method of stmt.methods) {
+            let declaration = FunctionType.METHOD
+            if (method.name.lexeme === "init") {
+                declaration = FunctionType.INITIALIZER;
+            }
+            this.resolveFunction(method, declaration)
+        }
+        this.endScope()
+
+        this.currentClass = enclosingClass
         return null
     }
 
@@ -186,6 +208,10 @@ export class Resolver {
 
         if(stmt.value)
         {
+            if (this.currentFunction == FunctionType.INITIALIZER) 
+            {
+                Lox.error(stmt.keyword, "Can't return a value from an initializer.");
+            }
             this.resolveExpression(stmt.value)
         }
         return null
@@ -219,6 +245,30 @@ export class Resolver {
     visitLambdaExpr(expr)
     {
         this.resolveFunction(expr, FunctionType.LAMBDA)
+        return null
+    }
+
+    visitGetExpr(expr)
+    {
+        this.resolveExpression(expr.object)
+        return null
+    }
+
+    visitSetExpr (expr)
+    {
+        this.resolveExpression(expr.object)
+        this.resolveExpression(expr.value)
+        return null
+    }
+
+    visitThisExpr (expr)
+    {
+        if(this.currentClass == ClassType.NONE)
+        {
+            Lox.error(expr.keyword, "Can't use 'this' outside of a class.");
+            return null;
+        }
+        this.resolveLocal(expr, expr.keyword)
         return null
     }
 

@@ -42,6 +42,42 @@ class Call extends Expr {
   }
 }
 
+class Get extends Expr {
+  constructor (object, name) {
+    super()
+    this.object = object
+    this.name = name
+  }
+
+  accept (visitor) {
+    return visitor.visitGetExpr(this)
+  }
+}
+
+class Set extends Expr {
+  constructor (object, name, value) {
+    super()
+    this.object = object
+    this.name = name
+    this.value = value
+  }
+
+  accept (visitor) {
+    return visitor.visitSetExpr(this)
+  }
+}
+
+class This extends Expr {
+  constructor (keyword) {
+    super()
+    this.keyword = keyword
+  }
+
+  accept (visitor) {
+    return visitor.visitThisExpr(this)
+  }
+}
+
 class Lambda extends Expr {
   constructor (name, params, body) {
     super()
@@ -130,6 +166,9 @@ export {
   Assign,
   Binary,
   Call,
+  Get,
+  Set,
+  This,
   Lambda,
   Grouping,
   Literal,

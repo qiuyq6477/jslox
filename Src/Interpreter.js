@@ -1,10 +1,11 @@
 import { TokenType, Token } from "./Token.js"
 import { RuntimeError } from "./RuntimeError.js"
 import { Environment } from "./Environment.js"
-import { Return } from "./Stmt.js"
+import { Return } from "./Return.js"
 import { LoxFunction, LocalFunction } from "./LoxFunction.js"
 import { LoxCallable } from "./LoxCallable.js"
 import { LoxClass } from "./LoxClass.js"
+import { LoxInstance } from "./LoxInstance.js"
 
 export class Interpreter {
     
@@ -57,7 +58,14 @@ export class Interpreter {
     visitClassStmt(stmt)
     {
         this.env.define(stmt.name.lexeme, null)
-        const klass = new LoxClass(stmt.name.lexeme)
+       
+        let methods = {}
+        for (const method of stmt.methods) {
+            const func = new LoxFunction(method, this.env, method.name.lexeme === "init")
+            methods[method.name.lexeme] = func
+        }
+
+        const klass = new LoxClass(stmt.name.lexeme, methods)
         this.env.assign(stmt.name, klass)
         return null
     }
@@ -90,7 +98,7 @@ export class Interpreter {
 
     visitFunctionStmt(stmt)
     {
-        const func = new LoxFunction(stmt, this.env)
+        const func = new LoxFunction(stmt, this.env, false)
         this.env.define(stmt.name.lexeme, func)
         return null
     }
@@ -255,6 +263,33 @@ export class Interpreter {
         return callee.call(this, args)
     }
 
+    visitGetExpr (expr)
+    {
+        const object = this.evaluate(expr.object);
+        if (object instanceof LoxInstance) {
+          return object.get(expr.name);
+        }
+    
+        throw new RuntimeError(expr.name, "Only instances have properties.");
+    }
+
+    visitSetExpr (expr)
+    {
+        const object = this.evaluate(expr.object)
+        if(!(object instanceof LoxInstance))
+        {
+            throw new RuntimeError(expr.name, "Only instances have fields.")
+        }
+        const value = this.evaluate(expr.value)
+        object.set(expr.name, value)
+        return value
+    }
+
+    visitThisExpr (expr)
+    {
+        return this.lookUpVariable(expr.keyword, expr)
+    }
+
     visitTernaryExpr (expr) 
     {
     }
@@ -329,7 +364,7 @@ export class Interpreter {
 
     visitLambdaExpr(expr)
     {
-        return new LoxFunction(expr, this.env)
+        return new LoxFunction(expr, this.env, false)
     }
 
     checkNumberOperand(operator, operand)

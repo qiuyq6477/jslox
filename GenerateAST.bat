@@ -1,0 +1,1 @@
+node ./Tool/GenerateAST.js ./Src
