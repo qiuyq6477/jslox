@@ -40,6 +40,10 @@ export class Parser {
                 {
                     return this.function("function")
                 }
+                else
+                {
+                    this.rollback()
+                }
             }
             if(this.match(TokenType.VAR))
             {
@@ -265,7 +269,22 @@ export class Parser {
     expressionStatement()
     {
         const expression = this.expression()
-        this.consume(TokenType.SEMICOLON, "Expect ';' after expression.")
+        if(expression instanceof Expr.Lambda)
+        {
+            if(this.peek().type == TokenType.SEMICOLON)
+            {
+                this.consume(TokenType.SEMICOLON, "Expect ';' after expression.")
+            }
+            else if(this.peek().type != TokenType.LEFT_PAREN)
+            {
+                this.error(this.peek(), "lambda must end with ';' or '('.")
+                throw new ParseError()
+            }
+        }
+        else
+        {
+            this.consume(TokenType.SEMICOLON, "Expect ';' after expression.")
+        }
         return new Stmt.Expression(expression)
     }
 
@@ -444,13 +463,15 @@ export class Parser {
         let args = []
         if(!this.check(TokenType.RIGHT_PAREN))
         {
-            do {
+            do 
+            {
                 if(args.length >= 255)
                 {
                     this.error(this.peek(), "Can't have more than 255 arguments.")
                 }
                 args.push(this.expression())
-            } while (this.match(TokenType.COMMA));
+            } 
+            while (this.match(TokenType.COMMA));
         }
 
         const paren = this.consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.")
@@ -541,7 +562,13 @@ export class Parser {
         if (!this.isAtEnd()) this.current++
         return this.previous()
     }
-
+    
+    rollback () 
+    {
+        this.current--
+        return this.tokens[this.current]
+    }
+    
     isAtEnd() 
     {
         return this.peek().type == TokenType.EOF;

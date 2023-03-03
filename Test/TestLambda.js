@@ -10,21 +10,25 @@ function main()
         
     const scanner = new Scanner(`
 
-    var sayHi = fun(first, last) {
-        print "Hi, " + first + " " + last + "!";
-    };
+    // var sayHi = fun(first, last) {
+    //     print "Hi, " + first + " " + last + "!";
+    // };
 
-    sayHi("Dear", "Reader");
+    // sayHi("Dear", "Reader");
 
-    fun thrice(fn) {
-        for (var i = 1; i <= 3; i = i + 1) {
-        fn(i);
-        }
-    }
+    // fun thrice(fn) {
+    //     for (var i = 1; i <= 3; i = i + 1) {
+    //     fn(i);
+    //     }
+    // }
     
-    thrice(fun (a) {
+    // thrice(fun (a) {
+    //     print a;
+    // });
+
+    fun (a) {
         print a;
-    });
+    }(1);
                 `)
     const tokens = scanner.scanTokens()
 
