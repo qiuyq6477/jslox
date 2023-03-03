@@ -21,7 +21,8 @@ export class Parser {
         return statements
     }
 
-    // declaration    → varDecl
+    // declaration    → classDecl
+    //                |varDecl
     //                | funDecl
     //                | statement ;
     // funDecl        → "fun" function ;
@@ -29,6 +30,10 @@ export class Parser {
     {
         try 
         {
+            if(this.match(TokenType.CLASS))
+            {
+                return this.classDeclaration()
+            }
             if(this.match(TokenType.FUN))
             {
                 if(this.peek().type == TokenType.IDENTIFIER)
@@ -47,6 +52,21 @@ export class Parser {
             this.synchronize()
             return null    
         }
+    }
+
+    classDeclaration()
+    {
+        const name = this.consume(TokenType.IDENTIFIER, "Expect class name.")
+        this.consume(TokenType.LEFT_BRACE, "Expect '{' before class body.")
+
+        let methods = []
+        while(!this.check(TokenType.RIGHT_BRACE))
+        {
+            methods.push(this.function("method"))
+        }
+
+        this.consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
+        return new Stmt.Class(name, methods)
     }
 
     // function       → IDENTIFIER "(" parameters? ")" block ;

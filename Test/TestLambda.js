@@ -1,8 +1,8 @@
-import { Scanner } from "../Scanner.js"
-import { Parser } from "../Parser.js"
-import { Lox } from "../Lox.js"
-import { Resolver } from "../Resolver.js"
-import { Interpreter } from "../Interpreter.js"
+import { Scanner } from "../Src/Scanner.js"
+import { Parser } from "../Src/Parser.js"
+import { Lox } from "../Src/Lox.js"
+import { Resolver } from "../Src/Resolver.js"
+import { Interpreter } from "../Src/Interpreter.js"
 
 
 function main()

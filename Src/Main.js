@@ -1,4 +1,4 @@
-import { Lox } from "./Lox.js";
+import { Lox } from "./Src/Lox.js";
 
 
 if(process.argv.length > 3)

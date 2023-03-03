@@ -1,4 +1,4 @@
-import { Scanner } from "../Scanner.js"
+import { Scanner } from "../Src/Scanner.js"
 
 const scanner = new Scanner(`
                     print 'hello world'

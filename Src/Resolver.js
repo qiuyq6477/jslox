@@ -54,6 +54,15 @@ const LoopType = {
     "WHILE" : "WHILE",
 }
   
+
+/**
+ * TODO:
+ * 1, 对解析器进行扩展，如果局部变量没有被使用就报告一个错误。
+ * 2, 将局部变量保存在一个数组中，并通过索引来查找它们。
+ *    扩展解析器，为作用域中声明的每个局部变量关联一个唯一的索引。
+ *    当解析一个变量的访问时，查找变量所在的作用域及对应的索引，并保存起来。
+ *    在解释器中，使用这个索引快速的访问一个变量。
+ */
 export class Resolver {
 
     constructor(interpreter)
@@ -80,6 +89,13 @@ export class Resolver {
     endScope()
     {
         this.scopes.pop()
+    }
+
+    visitClassStmt(stmt)
+    {
+        this.declare(stmt.name)
+        this.define(stmt.name)
+        return null
     }
 
     visitVarStmt(stmt)

@@ -1,19 +1,38 @@
-import { Scanner } from "../Scanner.js"
-import { Parser } from "../Parser.js"
-import { Lox } from "../Lox.js"
-import { Resolver } from "../Resolver.js"
-import { Interpreter } from "../Interpreter.js"
+import { Scanner } from "../Src/Scanner.js"
+import { Parser } from "../Src/Parser.js"
+import { Lox } from "../Src/Lox.js"
+import { Resolver } from "../Src/Resolver.js"
+import { Interpreter } from "../Src/Interpreter.js"
 
 function main()
 {
     const scanner = new Scanner(`
+    // var a = "global";
+    // fun scope(a) {
+    //     var a = "local";
+    //     print a;
+    // }
+    // scope(a);
+
+    // var a = "outer";
+    // {
+    //     var a = "inner";
+    //     print a;
+    // }
+
+
     var a = "global";
-    fun scope(a) {
-        a = "local";
-        print a;
+    {
+        fun showA() {
+            print a;
+        }
+
+        showA();
+        var a = "block";
+        showA();
     }
-    scope(a);
-                `)
+
+`)
     const tokens = scanner.scanTokens()
 
     const parser = new Parser(tokens)

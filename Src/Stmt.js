@@ -15,6 +15,18 @@ class Block extends Stmt {
   }
 }
 
+class Class extends Stmt {
+  constructor (name, methods) {
+    super()
+    this.name = name
+    this.methods = methods
+  }
+
+  accept (visitor) {
+    return visitor.visitClassStmt(this)
+  }
+}
+
 class Expression extends Stmt {
   constructor (expression) {
     super()
@@ -137,6 +149,7 @@ class Continue extends Stmt {
 
 export {
   Block,
+  Class,
   Expression,
   Function,
   If,

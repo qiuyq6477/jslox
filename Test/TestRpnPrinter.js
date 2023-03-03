@@ -1,6 +1,6 @@
-import * as Expr from "../Expr.js"
-import { RpnPrinter } from "../RpnPrinter.js";
-import { TokenType, Token } from "../Token.js";
+import * as Expr from "../Src/Expr.js"
+import { RpnPrinter } from "../Src/RpnPrinter.js";
+import { TokenType, Token } from "../Src/Token.js";
 
 const expression = new Expr.Binary(
     new Expr.Unary(

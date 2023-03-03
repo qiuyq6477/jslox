@@ -6,9 +6,16 @@ import { Interpreter } from "../Src/Interpreter.js"
 function main()
 {
     const scanner = new Scanner(`
-                    "1" <= "1";
-                    print "hello world";
-                    print 1+2;
+    class DevonshireCream {
+        serveOn() {
+          return "Scones";
+        }
+      }
+      
+    print DevonshireCream; // Prints "DevonshireCream".
+
+    var ins = DevonshireCream();
+    print ins;
                 `)
     const tokens = scanner.scanTokens()
 

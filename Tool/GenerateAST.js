@@ -24,6 +24,7 @@ class GenerateAST {
 
         this.defineAST(outputDir, "Stmt", {
             Block    : "List statements",
+            Class    : "Token name, List methods",
             Expression:"Expr expression",
             Function : "Token name, List params, List body",
             If       : "Expr condition, Stmt thenBranch, Stmt elseBrance",

@@ -2,8 +2,9 @@ import { TokenType, Token } from "./Token.js"
 import { RuntimeError } from "./RuntimeError.js"
 import { Environment } from "./Environment.js"
 import { Return } from "./Stmt.js"
-import { LoxCallable, LoxFunction, LocalFunction } from "./LoxFunction.js"
-
+import { LoxFunction, LocalFunction } from "./LoxFunction.js"
+import { LoxCallable } from "./LoxCallable.js"
+import { LoxClass } from "./LoxClass.js"
 
 export class Interpreter {
     
@@ -51,6 +52,14 @@ export class Interpreter {
         finally {
             this.env = previous
         }
+    }
+
+    visitClassStmt(stmt)
+    {
+        this.env.define(stmt.name.lexeme, null)
+        const klass = new LoxClass(stmt.name.lexeme)
+        this.env.assign(stmt.name, klass)
+        return null
     }
 
     visitBreakStmt(stmt)
@@ -134,7 +143,7 @@ export class Interpreter {
     visitPrintStmt(stmt)
     {
         const value = this.evaluate(stmt.expression)
-        console.log(value)
+        console.log(value.toString())
         return null
     }
 

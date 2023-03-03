@@ -1,6 +1,6 @@
-import { AstPrinter } from "../AstPrinter.js";
-import * as Expr from "../Expr.js"
-import { TokenType, Token } from "../Token.js";
+import { AstPrinter } from "../Src/AstPrinter.js";
+import * as Expr from "../Src/Expr.js"
+import { TokenType, Token } from "../Src/Token.js";
 
 const expression = new Expr.Binary(
     new Expr.Unary(

@@ -5,6 +5,7 @@ import { Parser } from "./Parser.js"
 import { TokenType } from "./Token.js"
 import { Interpreter } from "./Interpreter.js"
 
+//TODO: add list, map, io, input, math
 export class Lox {
     static interpreter = new Interpreter()
     constructor(){
@@ -71,6 +72,11 @@ export class Lox {
     static errorLine(line, message)
     {
         this.report(line, "", message)
+    }
+
+    static warnLine(line, message)
+    {
+        console.log("[line " + line + "] Warn" + where + ": " + message)
     }
 
     static parseError(token, message)

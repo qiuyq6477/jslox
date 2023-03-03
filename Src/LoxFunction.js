@@ -1,11 +1,6 @@
 import { Return } from "./Return.js"
 import { Environment } from "./Environment.js"
-
-
-export class LoxCallable {
-    arity () { return this._arity }
-    call (interpreter, args) {}
-}
+import { LoxCallable } from "./LoxCallable.js"
 
 export class LoxFunction extends LoxCallable {
     constructor (declaration, closure) 
