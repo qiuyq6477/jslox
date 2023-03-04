@@ -16,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/qiuyq6477/jslox/issues"
   },
-  "homepage": "https://github.com/qiuyq6477/jslox#readme"
+  "homepage": "https://github.com/qiuyq6477/jslox#readme",
+  "dependencies": {
+    "dox": "^1.0.0",
+    "graphviz": "^0.0.9",
+    "jax": "^0.1.0"
+  }
 }
