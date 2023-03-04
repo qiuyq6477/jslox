@@ -59,6 +59,7 @@ const LoopType = {
 const ClassType = {
     "NONE" : "NONE",
     "CLASS" : "CLASS",
+    "SUBCLASS" : "SUBCLASS",
 }
 
 /**
@@ -100,11 +101,23 @@ export class Resolver {
 
     visitClassStmt(stmt)
     {
-        let enclosingClass = this.currentClass;
-        this.currentClass = ClassType.CLASS;
+        let enclosingClass = this.currentClass
+        this.currentClass = ClassType.CLASS
 
         this.declare(stmt.name)
         this.define(stmt.name)
+
+        if (stmt.superclass != null && stmt.name.lexeme === stmt.superclass.name.lexeme) {
+            Lox.parseError(stmt.superclass.name, "A class can't inherit from itself.");
+        }
+        if(stmt.superclass)
+        {
+            this.currentClass = ClassType.SUBCLASS
+            this.resolveExpression(stmt.superclass)
+            this.beginScope()
+            this.scopes.peek()["super"] = true
+        }
+
         this.beginScope()
         this.scopes.peek()["this"] = true
         for (const method of stmt.methods) {
@@ -115,6 +128,11 @@ export class Resolver {
             this.resolveFunction(method, declaration)
         }
         this.endScope()
+
+        if(stmt.superclass != null)
+        {
+            this.endScope()
+        }
 
         this.currentClass = enclosingClass
         return null
@@ -210,7 +228,7 @@ export class Resolver {
         {
             if (this.currentFunction == FunctionType.INITIALIZER) 
             {
-                Lox.error(stmt.keyword, "Can't return a value from an initializer.");
+                Lox.parseError(stmt.keyword, "Can't return a value from an initializer.");
             }
             this.resolveExpression(stmt.value)
         }
@@ -265,8 +283,22 @@ export class Resolver {
     {
         if(this.currentClass == ClassType.NONE)
         {
-            Lox.error(expr.keyword, "Can't use 'this' outside of a class.");
+            Lox.parseError(expr.keyword, "Can't use 'this' outside of a class.");
             return null;
+        }
+        this.resolveLocal(expr, expr.keyword)
+        return null
+    }
+
+    visitSuperExpr (expr)
+    {
+        if (this.currentClass == ClassType.NONE) 
+        {
+            Lox.parseError(expr.keyword, "Can't use 'super' outside of a class.");
+        } 
+        else if (this.currentClass != ClassType.SUBCLASS) 
+        {
+            Lox.parseError(expr.keyword, "Can't use 'super' in a class with no superclass.");
         }
         this.resolveLocal(expr, expr.keyword)
         return null

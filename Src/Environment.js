@@ -39,7 +39,7 @@ export class Environment {
     getAt(distance, name)
     {
         const env = this.ancestor(distance)
-        return env.values[name.lexeme]
+        return env.values[name]
     }
 
     assignAt(distance, name, value)

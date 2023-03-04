@@ -21,7 +21,7 @@ export class Parser {
         return statements
     }
 
-    // declaration    → classDecl
+    // declaration    → classDecl ( "<" IDENTIFIER )?
     //                |varDecl
     //                | funDecl
     //                | statement ;
@@ -61,6 +61,14 @@ export class Parser {
     classDeclaration()
     {
         const name = this.consume(TokenType.IDENTIFIER, "Expect class name.")
+
+        let superclass = null
+        if(this.match(TokenType.LESS))
+        {
+            this.consume(TokenType.IDENTIFIER, "Expect superclass name.")
+            superclass = new Expr.Variable(this.previous())
+        }
+
         this.consume(TokenType.LEFT_BRACE, "Expect '{' before class body.")
 
         let methods = []
@@ -70,7 +78,7 @@ export class Parser {
         }
 
         this.consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
-        return new Stmt.Class(name, methods)
+        return new Stmt.Class(name, superclass, methods)
     }
 
     // function       → IDENTIFIER "(" parameters? ")" block ;
@@ -487,8 +495,9 @@ export class Parser {
         return new Expr.Call(callee, paren, args)
     }
 
-    // primary        → NUMBER | STRING | "true" | "false" | "nil"
-    //                  | "(" expression ")" ;
+    // primary        → "true" | "false" | "nil" | "this"
+    //                | NUMBER | STRING | IDENTIFIER | "(" expression ")"
+    //                | "super" "." IDENTIFIER ;
     primary()
     {
         if (this.match(TokenType.FALSE)) return new Expr.Literal(false)
@@ -505,7 +514,15 @@ export class Parser {
         {
           return new Expr.Literal(this.previous().literal)
         }
-    
+        
+        if (this.match(TokenType.SUPER))
+        {
+            const keyword = this.previous()
+            this.consume(TokenType.DOT, "Expect '.' after 'super'.")
+            const method = this.consume(TokenType.IDENTIFIER, "Expect superclass method name.")
+            return new Expr.Super(keyword, method)
+        }
+
         if (this.match(TokenType.IDENTIFIER)) 
         {
           return new Expr.Variable(this.previous())

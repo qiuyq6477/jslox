@@ -1,12 +1,14 @@
 import { LoxCallable } from "./LoxCallable.js"
 import { LoxInstance } from "./LoxInstance.js"
 
-//TODO: 支持静态方法，静态变量
+//TODO: 支持静态方法。静态变量。
+//      更多的跨类重用和共享功能：mixins, traits, multiple inheritance, virtual inheritance, extension methods, 等等。
 export class LoxClass extends LoxCallable {
-    constructor(name, methods)
+    constructor(name, superclass, methods)
     {
         super()
         this.name = name
+        this.superclass = superclass
         this.methods = methods
     }
 
@@ -43,7 +45,12 @@ export class LoxClass extends LoxCallable {
         {
             return this.methods[name];
         }
-
+        
+        if (this.superclass != null)
+        {
+            return this.superclass.findMethod(name)
+        }
+        
         return null
     }
 }

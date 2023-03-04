@@ -78,6 +78,18 @@ class This extends Expr {
   }
 }
 
+class Super extends Expr {
+  constructor (keyword, method) {
+    super()
+    this.keyword = keyword
+    this.method = method
+  }
+
+  accept (visitor) {
+    return visitor.visitSuperExpr(this)
+  }
+}
+
 class Lambda extends Expr {
   constructor (name, params, body) {
     super()
@@ -169,6 +181,7 @@ export {
   Get,
   Set,
   This,
+  Super,
   Lambda,
   Grouping,
   Literal,

@@ -16,6 +16,7 @@ class GenerateAST {
             Get      : "Expr object, Token name",
             Set      : "Expr object, Token name, Expr value",
             This     : "Token keyword",
+            Super    : "Token keyword, Token method",
             Lambda   : "Token name, List params, List body",
             Grouping : "Expr expression",
             Literal  : "Object value",
@@ -27,7 +28,7 @@ class GenerateAST {
 
         this.defineAST(outputDir, "Stmt", {
             Block    : "List statements",
-            Class    : "Token name, List methods",
+            Class    : "Token name, Variable superclass, List methods",
             Expression:"Expr expression",
             Function : "Token name, List params, List body",
             If       : "Expr condition, Stmt thenBranch, Stmt elseBrance",

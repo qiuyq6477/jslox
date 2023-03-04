@@ -57,15 +57,35 @@ export class Interpreter {
 
     visitClassStmt(stmt)
     {
+        let superclass = null;
+        if (stmt.superclass != null) 
+        {
+            superclass = this.evaluate(stmt.superclass);
+            if (!(superclass instanceof LoxClass)) 
+            {
+                throw new RuntimeError(stmt.superclass.name, "Superclass must be a class.");
+            }
+        }
+
         this.env.define(stmt.name.lexeme, null)
        
+        if (stmt.superclass != null) {
+            this.env = new Environment(this.env)
+            this.env.define("super", superclass)
+        }
+
         let methods = {}
         for (const method of stmt.methods) {
             const func = new LoxFunction(method, this.env, method.name.lexeme === "init")
             methods[method.name.lexeme] = func
         }
 
-        const klass = new LoxClass(stmt.name.lexeme, methods)
+        const klass = new LoxClass(stmt.name.lexeme, superclass, methods)
+
+        if (stmt.superclass != null) {
+            this.env = this.env.enclosing
+        }
+
         this.env.assign(stmt.name, klass)
         return null
     }
@@ -290,6 +310,18 @@ export class Interpreter {
         return this.lookUpVariable(expr.keyword, expr)
     }
 
+    visitSuperExpr (expr)
+    {
+        const distance = this.locals.get(expr)
+        const superclass = this.env.getAt(distance, "super")
+        const object = this.env.getAt(distance - 1, "this")
+        const method = superclass.findMethod(expr.method.lexeme)
+        if (method == null) {
+            throw new RuntimeError(expr.method, "Undefined property '" + expr.method.lexeme + "'.");
+        }
+        return method.bind(object)
+    }
+
     visitTernaryExpr (expr) 
     {
     }
@@ -354,7 +386,7 @@ export class Interpreter {
         let distance = this.locals.get(expr)
         if(distance != null)
         {
-            return this.env.getAt(distance, name)
+            return this.env.getAt(distance, name.lexeme)
         }
         else
         {
